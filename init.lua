@@ -10,8 +10,8 @@ sfcg = {
 	usages_cache = {},
 }
 
-dofile(modpath.."craftguide.lua")
+dofile(modpath.."/craftguide.lua")
 if (minetest.get_modpath("sfinv") and minetest.global_exists("sfinv")) then
-	dofile(modpath.."sfinv.lua")
+	dofile(modpath.."/sfinv.lua")
 end
 
