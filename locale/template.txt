@@ -1,4 +1,4 @@
-# textdomain: mtg_craftguide
+# textdomain: sfcraftguide
 Any coal=
 Any sand=
 Any wool=

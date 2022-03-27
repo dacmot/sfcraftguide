@@ -1,4 +1,4 @@
-local S = minetest.get_translator("mtg_craftguide")
+local S = minetest.get_translator(minetest.get_current_modname())
 local esc = minetest.formspec_escape
 
 local player_data = {}

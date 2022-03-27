@@ -1,10 +1,18 @@
-Minetest Game mod: mtg_craftguide
-=================================
+![luacheck](https://github.com/dacmot/sfcraftguide/actions/workflows/luacheck.yml/badge.svg)
 
-Adds a "Recipes" tab to the inventory. Click an item to see it's recipes.
+sfcraftguide
+============
+
+A simple craftguide without any hard dependencies. Supports a progressive reveal system that can follow doc items help.
+
+Based on [mtg_craftguide](https://github.com/minetest/minetest_game), which itself is based on [craftguide](https://github.com/minetest-mods/craftguide).
+
+Optional dependencies
+---------------------
+If sfinv is used, adds a "Recipes" tab to the inventory. Click an item to see it's recipes.
 Click again to show usages.
 
-Based on [craftguide](https://github.com/minetest-mods/craftguide).
+If [doc/help](https://forum.minetest.net/viewtopic.php?f=11&t=15912) is used, recipes reveal will be synchronized with the doc items discovered.
 
 Authors of media
 ----------------
