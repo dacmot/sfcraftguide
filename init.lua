@@ -49,6 +49,11 @@ local group_names = {
 	["color_dark_green,dye"] = S("Any dark green dye")
 }
 
+mtg_craftguide = {
+	group_stereotypes = group_stereotypes,
+	group_names = group_names
+}
+
 local function table_replace(t, val, new)
 	for k, v in pairs(t) do
 		if v == val then
@@ -315,7 +320,7 @@ local function imatch(str, filter)
 	return str:lower():find(filter, 1, true) ~= nil
 end
 
-local function execute_search(data)
+function mtg_craftguide.execute_search(data)
 	local filter = data.filter
 	if filter == "" then
 		data.items = init_items
@@ -333,6 +338,22 @@ local function execute_search(data)
 	end
 end
 
+function mtg_craftguide.get_usages(data, item)
+	return usages_cache[item]
+end
+
+function mtg_craftguide.get_recipes(data, item)
+	return recipes_cache[item]
+end
+
+function mtg_craftguide.update_for_player(playername)
+	local player = minetest.get_player_by_name(playername)
+	if player then
+		mtg_craftguide.execute_search(player_data[playername])
+		sfinv.set_player_inventory_formspec(player)
+	end
+end
+
 local function on_receive_fields(player, fields)
 	local name = player:get_player_name()
 	local data = player_data[name]
@@ -342,7 +363,7 @@ local function on_receive_fields(player, fields)
 		data.pagenum = 1
 		data.prev_item = nil
 		data.recipes = nil
-		data.items = init_items
+		mtg_craftguide.execute_search(data)
 		return true
 
 	elseif fields.key_enter_field == "filter" or fields.search then
@@ -352,7 +373,7 @@ local function on_receive_fields(player, fields)
 		end
 		data.filter = new
 		data.pagenum = 1
-		execute_search(data)
+		mtg_craftguide.execute_search(data)
 		return true
 
 	elseif fields.prev or fields.next then
@@ -394,9 +415,9 @@ local function on_receive_fields(player, fields)
 			data.show_usages = nil
 		end
 		if data.show_usages then
-			data.recipes = usages_cache[item]
+			data.recipes = mtg_craftguide.get_usages(data, item)
 		else
-			data.recipes = recipes_cache[item]
+			data.recipes = mtg_craftguide.get_recipes(data, item)
 		end
 		data.prev_item = item
 		data.rnum = 1
@@ -408,12 +429,14 @@ minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	local info = minetest.get_player_information(name)
 
-	player_data[name] = {
+	local data = {
 		filter = "",
 		pagenum = 1,
-		items = init_items,
-		lang_code = info.lang_code
+		lang_code = info.lang_code,
+		playername = name
 	}
+	player_data[name] = data
+	mtg_craftguide.execute_search(data)
 end)
 
 minetest.register_on_leaveplayer(function(player)
