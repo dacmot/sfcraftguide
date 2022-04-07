@@ -61,7 +61,7 @@ local function imatch(str, filter)
 end
 
 
-local function execute_search(data)
+function sfcg.execute_search(data)
   local init_items = sfcg.init_items
 	local filter = data.filter
 	if filter == "" then
@@ -70,12 +70,23 @@ local function execute_search(data)
 	end
 	data.items = {}
 
+  local reg_items = minetest.registered_items
 	for _, item in ipairs(init_items) do
-		local def = minetest.registered_items[item]
-		local desc = def and minetest.get_translated_string(data.lang_code, def.description)
-
-		if imatch(item, filter) or desc and imatch(desc, filter) then
-			table.insert(data.items, item)
+    if imatch(item, filter) then
+      table.insert(data.items, item)
+    else
+      local def = reg_items[item]
+      local desc = def and def.description
+      if desc then
+        if imatch(desc, filter) then
+          table.insert(data.items, item)
+        else
+          local tr_desc = minetest.get_translated_string(data.lang_code, desc)
+          if tr_desc and imatch(tr_desc, filter) then
+            table.insert(data.items, item)
+          end
+        end
+      end
 		end
 	end
 end
@@ -90,7 +101,7 @@ local function table_replace(t, val, new)
 end
 
 
-local function item_has_groups(item_groups, groups)
+function sfcg.item_has_groups(item_groups, groups)
 	for _, group in ipairs(groups) do
 		if not item_groups[group] then
 			return false
@@ -98,9 +109,10 @@ local function item_has_groups(item_groups, groups)
 	end
 	return true
 end
+local item_has_groups = sfcg.item_has_groups
 
 
-local function groups_to_item(groups)
+function sfcg.groups_to_item(groups)
 	if #groups == 1 then
 		local group = groups[1]
 		if group_stereotypes[group] then
@@ -126,13 +138,15 @@ local function get_craftable_recipes(output)
 		return nil
 	end
 
+  local groups_to_item = sfcg.groups_to_item
+  local reg_items = minetest.registered_items
 	for i = #recipes, 1, -1 do
 		for _, item in pairs(recipes[i].items) do
 			local groups = extract_groups(item)
 			if groups then
 				item = groups_to_item(groups)
 			end
-			if not minetest.registered_items[item] then
+			if not reg_items[item] then
 				table.remove(recipes, i)
 				break
 			end
@@ -146,7 +160,7 @@ end
 
 
 local function show_item(def)
-	return def.groups.not_in_craft_guide ~= 1 and def.description ~= ""
+	return def and def.groups and def.groups.not_in_craft_guide ~= 1 and def.description ~= ""
 end
 
 
@@ -154,13 +168,14 @@ local function cache_usages(recipe)
 
 	local added = {}
   local usages_cache = sfcg.usages_cache
+  local reg_items = minetest.registered_items
 
 	for _, item in pairs(recipe.items) do
 		if not added[item] then
 			local groups = extract_groups(item)
 			if groups then
 
-				for name, def in pairs(minetest.registered_items) do
+				for name, def in pairs(reg_items) do
 					if not added[name] and show_item(def)
 							and item_has_groups(def.groups, groups) then
 						local usage = table.copy(recipe)
@@ -171,7 +186,7 @@ local function cache_usages(recipe)
 					end
 				end
 
-			elseif show_item(minetest.registered_items[item]) then
+			elseif show_item(reg_items[item]) then
 				usages_cache[item] = usages_cache[item] or {}
 				table.insert(usages_cache[item], recipe)
 			end
@@ -185,6 +200,7 @@ end
 local function is_fuel(item)
 	return minetest.get_craft_result({method="fuel", items={item}}).time > 0
 end
+
 
 function sfcg.item_button_fs(fs, x, y, item, element_name, groups)
 	table.insert(fs, ("item_image_button[%s,%s;1.05,1.05;%s;%s;%s]")
@@ -212,6 +228,7 @@ function sfcg.item_button_fs(fs, x, y, item, element_name, groups)
 	end
 end
 
+
 function sfcg.on_receive_fields(player, fields)
 	local name = player:get_player_name()
 	local data = sfcg.player_data[name]
@@ -231,7 +248,7 @@ function sfcg.on_receive_fields(player, fields)
 		end
 		data.filter = new
 		data.pagenum = 1
-		execute_search(data)
+		sfcg.execute_search(data)
 		return true
 
 	elseif fields.prev or fields.next then
@@ -284,6 +301,15 @@ function sfcg.on_receive_fields(player, fields)
 end
 
 
+function sfcg.update_for_player(playername)
+	local player = minetest.get_player_by_name(playername)
+	if player then
+		sfcg.execute_search(sfcg.player_data[playername])
+	end
+  return player
+end
+
+
 minetest.register_on_mods_loaded(function()
   local recipes_cache = sfcg.recipes_cache
   local usages_cache = sfcg.usages_cache
@@ -312,12 +338,15 @@ minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	local info = minetest.get_player_information(name)
 
-	sfcg.player_data[name] = {
+	local data = {
+    playername = name,
 		filter = "",
 		pagenum = 1,
 		items = sfcg.init_items,
 		lang_code = info.lang_code
 	}
+  sfcg.player_data[name] = data
+  sfcg.execute_search(data)
 end)
 
 

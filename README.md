@@ -3,16 +3,15 @@
 sfcraftguide
 ============
 
-A simple craftguide without any hard dependencies. Supports a progressive reveal system that can follow doc items help.
+An augmented mtg_craftguide. Supports a progressive reveal system that follows doc items help.
 
 Based on [mtg_craftguide](https://github.com/minetest/minetest_game), which itself is based on [craftguide](https://github.com/minetest-mods/craftguide).
 
-Optional dependencies
+Dependencies
 ---------------------
-If sfinv is used, adds a "Recipes" tab to the inventory. Click an item to see it's recipes.
-Click again to show usages.
+Adds a "Recipes" tab to the sfinv inventory. Click an item to see it's recipes. Click again to show usages.
 
-If [doc/help](https://forum.minetest.net/viewtopic.php?f=11&t=15912) is used, recipes reveal will be synchronized with the doc items discovered.
+Recipes reveal will be synchronized with the doc items discovered ([doc/help](https://forum.minetest.net/viewtopic.php?f=11&t=15912))
 
 Authors of media
 ----------------

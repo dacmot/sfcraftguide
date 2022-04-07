@@ -6,6 +6,7 @@ local function coords(i, cols)
 	return i % cols, math.floor(i / cols)
 end
 
+
 local function recipe_fs(fs, data)
 	local recipe = data.recipes[data.rnum]
 	local width = recipe.width
@@ -125,6 +126,15 @@ local function get_formspec(player)
 	table.insert(fs, "container_end[]")
 
 	return table.concat(fs)
+end
+
+local orig_update_for_player = sfcg.update_for_player
+function sfcg.update_for_player(playername)
+	local player = orig_update_for_player(playername)
+	if player then
+		sfinv.set_player_inventory_formspec(player)
+	end
+  return player
 end
 
 
