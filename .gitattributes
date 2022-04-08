@@ -2,12 +2,14 @@
 .gitignore     text
 
 *.lua       text
+*.yml       text
 *.tr        text
 *.md        text
 *.txt       text
 mod.conf    text
 .luacheckrc text
 LICENSE     text
+*.json      text
 
 *.jpg   binary
 *.png   binary
