@@ -149,3 +149,16 @@ sfinv.register_page("sfcraftguide:craftguide", {
 		end
 	end
 })
+
+
+minetest.register_on_mods_loaded(function()
+
+  sfinv.pages["mtg_craftguide:craftguide"] = nil
+  for idx = #sfinv.pages_unordered, 1, -1 do
+    local page = sfinv.pages_unordered[idx]
+    if page.name == "mtg_craftguide:craftguide" then
+      table.remove(sfinv.pages_unordered, idx)
+    end
+  end
+
+end)

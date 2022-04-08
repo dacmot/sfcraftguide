@@ -311,6 +311,7 @@ end
 
 
 minetest.register_on_mods_loaded(function()
+
   local recipes_cache = sfcg.recipes_cache
   local usages_cache = sfcg.usages_cache
   local init_items = sfcg.init_items
@@ -325,12 +326,14 @@ minetest.register_on_mods_loaded(function()
 			end
 		end
 	end
+
 	for name, def in pairs(minetest.registered_items) do
 		if recipes_cache[name] or usages_cache[name] then
 			table.insert(init_items, name)
 		end
 	end
 	table.sort(init_items)
+
 end)
 
 

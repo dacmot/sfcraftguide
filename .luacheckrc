@@ -4,6 +4,7 @@ allow_defined_top = true
 globals = {
     "sfcg",
     "doc",
+    "sfinv",
 }
 
 read_globals = {
@@ -25,8 +26,6 @@ read_globals = {
     "AreaStore",
 
     "vector",
-
-    "sfinv",
 
     table = {
         fields = {
