@@ -16,4 +16,5 @@ LICENSE     text
 *.mts   binary
 *.xcf   binary
 
-.* export-ignore
+.*           export-ignore
+Screenshot.* export-ignore
